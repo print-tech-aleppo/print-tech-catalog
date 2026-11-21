@@ -232,6 +232,44 @@
             display: none; /* Chrome/Safari */
         }
 
+        /* Filter scroll arrows (RTL: next = left, reveals more; prev = right, goes back) */
+        .filters-scroll {
+            display: flex;
+            align-items: center;
+        }
+        .filters-scroll .filters {
+            flex: 1;
+            min-width: 0;
+            scroll-behavior: smooth;
+        }
+        .filters-arrow {
+            flex: 0 0 auto;
+            width: 0;
+            height: 32px;
+            padding: 0;
+            margin: 0;
+            border: 1px solid var(--color-kiwi);
+            border-radius: 50%;
+            background-color: var(--color-white);
+            color: var(--color-kiwi-dark);
+            font-size: 1.3rem;
+            line-height: 1;
+            cursor: pointer;
+            opacity: 0;
+            overflow: hidden;
+            transition: width var(--transition-speed), opacity var(--transition-speed), margin var(--transition-speed);
+            box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .filters-arrow.visible {
+            width: 32px;
+            opacity: 1;
+        }
+        .filters-arrow.visible.arrow-next { margin-right: 8px; }
+        .filters-arrow.visible.arrow-prev { margin-left: 8px; }
+
         .filter-chip {
             background-color: var(--color-silver-light);
             color: var(--color-ink);
@@ -734,8 +772,12 @@
 
     <div class="filters-wrapper">
         <div class="container">
-            <div class="filters" id="filtersContainer">
-                <!-- Filters rendered by JS -->
+            <div class="filters-scroll">
+                <button class="filters-arrow arrow-prev" id="filtersPrev" aria-label="الأقسام السابقة">›</button>
+                <div class="filters" id="filtersContainer">
+                    <!-- Filters rendered by JS -->
+                </div>
+                <button class="filters-arrow arrow-next" id="filtersNext" aria-label="المزيد من الأقسام">‹</button>
             </div>
         </div>
     </div>
@@ -968,11 +1010,33 @@
                 chip.addEventListener('click', (e) => {
                     document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
                     e.currentTarget.classList.add('active');
+                    e.currentTarget.scrollIntoView({ behavior: 'smooth', inline: 'nearest', block: 'nearest' });
                     activeCategory = e.currentTarget.dataset.cat;
                     filterProducts();
                 });
             });
+            updateFilterArrows();
         }
+
+        // Filter scroll arrows (RTL-safe: scrollLeft is negative in Chrome/Firefox, positive in Safari)
+        const filtersNext = document.getElementById('filtersNext');
+        const filtersPrev = document.getElementById('filtersPrev');
+        function updateFilterArrows() {
+            const el = filtersContainer;
+            const max = el.scrollWidth - el.clientWidth;
+            if (max <= 4) { // everything fits, no arrows needed
+                filtersNext.classList.remove('visible');
+                filtersPrev.classList.remove('visible');
+                return;
+            }
+            const scrolled = el.scrollLeft <= 0 ? -el.scrollLeft : max - el.scrollLeft;
+            filtersNext.classList.toggle('visible', scrolled < max - 4);
+            filtersPrev.classList.toggle('visible', scrolled > 4);
+        }
+        filtersNext.addEventListener('click', () => filtersContainer.scrollBy({ left: -320, behavior: 'smooth' }));
+        filtersPrev.addEventListener('click', () => filtersContainer.scrollBy({ left: 320, behavior: 'smooth' }));
+        filtersContainer.addEventListener('scroll', updateFilterArrows, { passive: true });
+        window.addEventListener('resize', updateFilterArrows);
 
         function filterProducts() {
             filteredProducts = allProducts.filter(p => {
