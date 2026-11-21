@@ -308,6 +308,11 @@
             color: var(--color-white);
         }
 
+        /* Category sidebar (desktop only; hidden on mobile) */
+        .sidebar {
+            display: none;
+        }
+
         /* Results Counter */
         .results-counter {
             font-size: 0.9rem;
@@ -716,6 +721,66 @@
 
         @media(min-width: 1024px) {
             .grid-mode { grid-template-columns: repeat(4, 1fr); }
+            /* Desktop: full category list in a right sidebar; top filter bar hidden */
+            .filters-wrapper { display: none; }
+            .shop-layout {
+                display: flex;
+                gap: 24px;
+                align-items: flex-start;
+            }
+            .sidebar {
+                display: block;
+                flex: 0 0 220px;
+                position: sticky;
+                top: calc(var(--header-h, 122px) + 16px);
+                background: var(--color-white);
+                border-radius: var(--border-radius);
+                box-shadow: var(--shadow-sm);
+                padding: 16px;
+            }
+            .sidebar-title {
+                font-size: 1rem;
+                font-weight: 700;
+                margin-bottom: 12px;
+                color: var(--color-ink);
+            }
+            .sidebar-cats {
+                display: flex;
+                flex-direction: column;
+                gap: 4px;
+            }
+            .sidebar-item {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 8px;
+                width: 100%;
+                text-align: right;
+                padding: 10px 12px;
+                border-radius: 10px;
+                font-size: 0.95rem;
+                font-weight: 600;
+                color: var(--color-ink);
+                background: transparent;
+                cursor: pointer;
+                transition: background-color var(--transition-speed);
+            }
+            .sidebar-item:hover { background-color: var(--color-silver-light); }
+            .sidebar-item.active {
+                background-color: var(--color-kiwi);
+                color: var(--color-white);
+            }
+            .sidebar-item .count {
+                background-color: rgba(0,0,0,0.08);
+                padding: 2px 8px;
+                border-radius: 10px;
+                font-size: 0.75rem;
+                flex-shrink: 0;
+            }
+            .sidebar-item.active .count { background-color: rgba(255,255,255,0.2); }
+            .sidebar-item.favorite-item { color: #e74c3c; }
+            .sidebar-item.favorite-item.active { background-color: #e74c3c; color: var(--color-white); }
+            .shop-content { flex: 1; min-width: 0; }
         }
 
         @media (prefers-reduced-motion: reduce) {
@@ -783,10 +848,20 @@
     </div>
 
     <div class="container">
-        <div class="results-counter" id="resultsCount"></div>
-        <main class="product-grid grid-mode" id="productGrid">
-            <!-- Products rendered by JS -->
-        </main>
+        <div class="shop-layout">
+            <aside class="sidebar" id="sidebar">
+                <h2 class="sidebar-title">التصنيفات</h2>
+                <nav class="sidebar-cats" id="sidebarCats">
+                    <!-- Categories rendered by JS -->
+                </nav>
+            </aside>
+            <div class="shop-content">
+                <div class="results-counter" id="resultsCount"></div>
+                <main class="product-grid grid-mode" id="productGrid">
+                    <!-- Products rendered by JS -->
+                </main>
+            </div>
+        </div>
     </div>
 
     <section class="info-section">
@@ -987,12 +1062,22 @@
                     الكل <span class="count">${allProducts.length}</span>
                 </button>
             `;
+            let sideHtml = `
+                <button class="sidebar-item ${activeCategory === 'all' ? 'active' : ''}" data-cat="all">
+                    <span>الكل</span> <span class="count">${allProducts.length}</span>
+                </button>
+            `;
             
             categories.forEach(cat => {
                 const count = allProducts.filter(p => p.category === cat).length;
                 html += `
                     <button class="filter-chip ${activeCategory === cat ? 'active' : ''}" data-cat="${cat}">
                         ${cat} <span class="count">${count}</span>
+                    </button>
+                `;
+                sideHtml += `
+                    <button class="sidebar-item ${activeCategory === cat ? 'active' : ''}" data-cat="${cat}">
+                        <span>${cat}</span> <span class="count">${count}</span>
                     </button>
                 `;
             });
@@ -1003,15 +1088,24 @@
                     المفضلة <span class="count" id="favCount">${favorites.length}</span>
                 </button>
             `;
+            sideHtml += `
+                <button class="sidebar-item favorite-item ${activeCategory === 'favorites' ? 'active' : ''}" data-cat="favorites">
+                    <span style="display:flex;align-items:center;gap:6px;"><svg viewBox="0 0 24 24" style="width:16px;height:16px;"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg> المفضلة</span> <span class="count" id="favCountSide">${favorites.length}</span>
+                </button>
+            `;
             
             filtersContainer.innerHTML = html;
+            document.getElementById('sidebarCats').innerHTML = sideHtml;
 
-            document.querySelectorAll('.filter-chip').forEach(chip => {
-                chip.addEventListener('click', (e) => {
-                    document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
-                    e.currentTarget.classList.add('active');
-                    e.currentTarget.scrollIntoView({ behavior: 'smooth', inline: 'nearest', block: 'nearest' });
-                    activeCategory = e.currentTarget.dataset.cat;
+            document.querySelectorAll('.filter-chip, .sidebar-item').forEach(el => {
+                el.addEventListener('click', (e) => {
+                    const cat = e.currentTarget.dataset.cat;
+                    document.querySelectorAll('.filter-chip, .sidebar-item').forEach(c => c.classList.remove('active'));
+                    document.querySelectorAll(`.filter-chip[data-cat="${cat}"], .sidebar-item[data-cat="${cat}"]`).forEach(c => c.classList.add('active'));
+                    if (e.currentTarget.classList.contains('filter-chip')) {
+                        e.currentTarget.scrollIntoView({ behavior: 'smooth', inline: 'nearest', block: 'nearest' });
+                    }
+                    activeCategory = cat;
                     filterProducts();
                 });
             });
@@ -1112,6 +1206,8 @@
             
             const favCountEl = document.getElementById('favCount');
             if(favCountEl) favCountEl.textContent = favorites.length;
+            const favCountSideEl = document.getElementById('favCountSide');
+            if(favCountSideEl) favCountSideEl.textContent = favorites.length;
 
             // If we are currently in favorites tab, remove card gracefully
             if (activeCategory === 'favorites') {
@@ -1158,6 +1254,8 @@
                 
                 const favCountEl = document.getElementById('favCount');
                 if(favCountEl) favCountEl.textContent = favorites.length;
+                const favCountSideEl = document.getElementById('favCountSide');
+                if(favCountSideEl) favCountSideEl.textContent = favorites.length;
                 
                 // Don't refilter immediately if in favorites tab to avoid jarring change while lightbox open
             }
