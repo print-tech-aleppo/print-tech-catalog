@@ -3,15 +3,11 @@
   {
    "id": "p01",
    "category": "باكجات دعاية",
-   "name": "باكج دعاية NP186",
+   "name": "باكج دعاية NP186 — قفل دائري",
    "images": [
     {
      "thumb": "images/img001-thumb.jpg",
      "full": "images/img001-full.jpg"
-    },
-    {
-     "thumb": "images/img002-thumb.jpg",
-     "full": "images/img002-full.jpg"
     }
    ],
    "contents": "دفتر ـ قلم ـ حافظة ـ بورتكليه",
@@ -108,26 +104,14 @@
   {
    "id": "p07",
    "category": "دفاتر نوت بوك",
-   "name": "دفتر نوت بوك NB72 — A5",
+   "name": "دفتر نوت بوك NB72 — أسود",
    "images": [
     {
      "thumb": "images/img011-thumb.jpg",
      "full": "images/img011-full.jpg"
-    },
-    {
-     "thumb": "images/img012-thumb.jpg",
-     "full": "images/img012-full.jpg"
-    },
-    {
-     "thumb": "images/img013-thumb.jpg",
-     "full": "images/img013-full.jpg"
-    },
-    {
-     "thumb": "images/img014-thumb.jpg",
-     "full": "images/img014-full.jpg"
     }
    ],
-   "contents": "دفتر نوت بوك A5 — متوفر بأربعة ألوان",
+   "contents": "دفتر نوت بوك A5",
    "code": "NB72",
    "raw": "240 ل.س",
    "printed": "350 ل.س"
@@ -881,6 +865,66 @@
      "full": "images/img086-full.jpg"
     }
    ]
+  },
+  {
+   "id": "p74",
+   "category": "دفاتر نوت بوك",
+   "name": "دفتر نوت بوك NB72 — أزرق",
+   "images": [
+    {
+     "thumb": "images/img012-thumb.jpg",
+     "full": "images/img012-full.jpg"
+    }
+   ],
+   "contents": "دفتر نوت بوك A5",
+   "code": "NB72",
+   "raw": "240 ل.س",
+   "printed": "350 ل.س"
+  },
+  {
+   "id": "p75",
+   "category": "دفاتر نوت بوك",
+   "name": "دفتر نوت بوك NB72 — بني",
+   "images": [
+    {
+     "thumb": "images/img013-thumb.jpg",
+     "full": "images/img013-full.jpg"
+    }
+   ],
+   "contents": "دفتر نوت بوك A5",
+   "code": "NB72",
+   "raw": "240 ل.س",
+   "printed": "350 ل.س"
+  },
+  {
+   "id": "p76",
+   "category": "دفاتر نوت بوك",
+   "name": "دفتر نوت بوك NB72 — أخضر",
+   "images": [
+    {
+     "thumb": "images/img014-thumb.jpg",
+     "full": "images/img014-full.jpg"
+    }
+   ],
+   "contents": "دفتر نوت بوك A5",
+   "code": "NB72",
+   "raw": "240 ل.س",
+   "printed": "350 ل.س"
+  },
+  {
+   "id": "p77",
+   "category": "باكجات دعاية",
+   "name": "باكج دعاية NP186 — قفل مستطيل",
+   "images": [
+    {
+     "thumb": "images/img002-thumb.jpg",
+     "full": "images/img002-full.jpg"
+    }
+   ],
+   "contents": "دفتر ـ قلم ـ حافظة ـ بورتكليه",
+   "code": "NP186",
+   "raw": "1,280 ل.س",
+   "printed": "1,400 ل.س"
   }
  ]
 }
